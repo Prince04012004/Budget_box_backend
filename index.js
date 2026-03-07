@@ -9,14 +9,18 @@ import { budgetreset } from "./Cron/budgetreset.js";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 10000;
 
 // Middleware
-app.use(cors({
-  origin: "*"
-}));
-
+app.use(cors());
 app.use(express.json());
+
+// Routes
+app.get("/", (req, res) => {
+  res.send("BudgetBox Backend is Running!");
+});
+
+app.use("/api", authroutes);
+app.use("/api", addexpenseRouter);
 
 // Database connect
 connectDB();
@@ -24,16 +28,10 @@ connectDB();
 // Cron job
 budgetreset();
 
-// Routes
-app.use("/api", authroutes);
-app.use("/api", addexpenseRouter);
-
-// Test route
-app.get("/", (req, res) => {
-  res.send("BudgetBox Backend is Running!");
-});
+// PORT (Render / cloud deploy ke liye important)
+const PORT = process.env.PORT || 10000;
 
 // Server start
-app.listen(port, "0.0.0.0", () => {
-  console.log(`Server running on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
