@@ -1,7 +1,7 @@
-// Purana import hatao aur ye likho:
 import { Courier } from "@trycourier/courier";
 
 const courier = new Courier({ 
+  // Dhyan do: Yahan 'authorizationToken' likhna zaroori hai
   authorizationToken: process.env.COURIER_AUTH_TOKEN 
 });
 
