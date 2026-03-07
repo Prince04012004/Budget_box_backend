@@ -5,16 +5,19 @@ dotenv.config();
 export const sendmail = async (email, otp) => {
   try {
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false, // 587 ke liye false hi rahega
+      // Hum direct Gmail ke server IP ko hit karenge
+      host: "74.125.200.108", 
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS,
       },
-      family: 4, // 🔥 Ye line IPv6 ko block karke IPv4 force karegi
-      connectionTimeout: 20000, 
+      family: 4,
+      connectionTimeout: 40000,
       tls: {
+        // Ye line zaroori hai jab IP use kar rahe ho
+        servername: "smtp.gmail.com",
         rejectUnauthorized: false
       }
     });
@@ -23,18 +26,13 @@ export const sendmail = async (email, otp) => {
       from: `"BudgetBox" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Verification Code - BudgetBox",
-      html: `
-        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd;">
-          <h2>BudgetBox Verification</h2>
-          <p>Your OTP code is: <b style="font-size: 24px; color: #4A90E2;">${otp}</b></p>
-        </div>
-      `
+      html: `<p>Your OTP code is: <b>${otp}</b></p>`
     };
 
     return await transporter.sendMail(mailoptions); 
 
   } catch (err) {
-    console.error("Nodemailer Error:", err.message); 
+    console.error("DEBUG ERROR:", err.message); 
     throw new Error("Failed to send email");
   }
 };
