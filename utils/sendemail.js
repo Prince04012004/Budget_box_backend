@@ -1,8 +1,8 @@
 import { Courier } from "@trycourier/courier";
 
-// Fix: Yahan 'authorizationToken' key ka hi use karein
+// Is tarah likhne se Courier ko error dene ka mauka nahi milega
 const courier = new Courier({ 
-  authorizationToken: process.env.COURIER_AUTH_TOKEN 
+  apiKey: process.env.COURIER_AUTH_TOKEN || process.env.COURIER_API_KEY 
 });
 
 export const sendmail = async (email, otp) => {
@@ -16,7 +16,7 @@ export const sendmail = async (email, otp) => {
         },
       },
     });
-    console.log("OTP Sent via Courier! ID:", requestId);
+    console.log("OTP Sent! ID:", requestId);
   } catch (err) {
     console.error("Courier Error:", err.message);
     throw err;
