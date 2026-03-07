@@ -1,7 +1,7 @@
 import { Courier } from "@trycourier/courier";
 
+// Fix: Yahan 'authorizationToken' key ka hi use karein
 const courier = new Courier({ 
-  // Dhyan do: Yahan 'authorizationToken' likhna zaroori hai
   authorizationToken: process.env.COURIER_AUTH_TOKEN 
 });
 
