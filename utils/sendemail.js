@@ -1,34 +1,21 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import dotenv from "dotenv";
+
 dotenv.config();
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendmail = async (email, otp) => {
   try {
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      },
-      tls: {
-        rejectUnauthorized: false
-      }
-    });
-
-    const mailoptions = {
-      from: process.env.EMAIL_USER,
+    const data = await resend.emails.send({
+      from: "BudgetBox <onboarding@resend.dev>",
       to: email,
       subject: "BudgetBox OTP",
-      text: `Your OTP is ${otp}`
-    };
+      html: `<h2>Your OTP is ${otp}</h2>`
+    });
 
-    const info = await transporter.sendMail(mailoptions);
-
-    console.log("Email sent:", info.messageId);
-
-  } catch (err) {
-    console.error("FULL ERROR:", err);
-    throw new Error("Failed to send email");
+    console.log("Email sent:", data);
+  } catch (error) {
+    console.error("Email error:", error);
   }
 };
