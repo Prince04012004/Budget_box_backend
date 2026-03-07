@@ -1,21 +1,24 @@
-import { Resend } from "resend";
-import dotenv from "dotenv";
+import { CourierClient } from "@trycourier/courier";
 
-dotenv.config();
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Ye values Render ke Environment Variables se uthayega
+const courier = CourierClient({ 
+  authorizationToken: process.env.COURIER_AUTH_TOKEN 
+});
 
 export const sendmail = async (email, otp) => {
   try {
-    const data = await resend.emails.send({
-      from: "BudgetBox <onboarding@resend.dev>",
-      to: email,
-      subject: "BudgetBox OTP",
-      html: `<h2>Your OTP is ${otp}</h2>`
+    const { requestId } = await courier.send({
+      message: {
+        to: { email: email },
+        template: "Gmail_otp", // Jo tumne Courier dashboard par banaya hai
+        data: {
+          otp_code: otp, // Ye tumhare {{otp_code}} variable se match karega
+        },
+      },
     });
-
-    console.log("Email sent:", data);
-  } catch (error) {
-    console.error("Email error:", error);
+    console.log("OTP Sent via Courier! ID:", requestId);
+  } catch (err) {
+    console.error("Courier Error:", err.message);
+    throw err;
   }
 };
