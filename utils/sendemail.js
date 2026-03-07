@@ -6,14 +6,16 @@ export const sendmail = async (email, otp) => {
   try {
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS,
       },
       family: 4,
-      connectionTimeout: 10000,
+      connectionTimeout: 20000, 
+      greetingTimeout: 20000,
+      socketTimeout: 20000,
       tls: {
         rejectUnauthorized: false
       }
@@ -36,7 +38,7 @@ export const sendmail = async (email, otp) => {
     return result;
 
   } catch (err) {
-    console.error("Nodemailer Error:", err.message); 
+    console.error("Nodemailer Error Details:", err); 
     throw new Error("Failed to send email");
   }
 };
