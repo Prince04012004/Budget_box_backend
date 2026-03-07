@@ -8,14 +8,15 @@ import { budgetreset } from "./Cron/budgetreset.js";
 const app = express();
 const port = process.env.PORT || 10000;
 
-// Middleware
+// Middleware - Sabse simple CORS configuration
 app.use(cors({
-  origin: "*",
+  origin: "*", 
   credentials: true
 }));
+
 app.use(express.json());
 
-// Database and Cron
+// Database and Cron initialization
 connectDB();
 budgetreset();
 
@@ -27,7 +28,7 @@ app.get("/", (req, res) => {
   res.send("BudgetBox Backend is Running!");
 });
 
-// Server Start
+// Server Start - Port Binding fix for Render
 app.listen(port, "0.0.0.0", () => {
   console.log(`App is running on port ${port}`);
 });
