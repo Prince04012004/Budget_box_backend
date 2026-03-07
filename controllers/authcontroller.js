@@ -2,7 +2,7 @@ import User from "../model/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Otp from "../model/Otp.js";
-import sendmail from "../utils/sendemail.js";
+import { sendmail } from "../utils/sendemail.js";
 import env from "dotenv";
 env.config();
 
