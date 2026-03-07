@@ -191,35 +191,26 @@ export const updateexpense = async (req, res) => {
 export const dashbaord = async (req, res) => {
   try {
     const userId = req.user.id;
-
     const transactions = await Transaction.find({ userId });
 
-    //total expenses
     const totalexpenses = transactions.reduce(
       (total, transaction) => total + transaction.amount,
       0,
     );
 
-    //today expenses
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const todayexpenses = transactions
-      .filter((transaction) => transaction.date >= today)
-      .reduce((total, transaction) => total + transaction.amount, 0);
+    const todayTransactions = transactions.filter((t) => t.date >= today);
+    const todayexpenses = todayTransactions.reduce((total, t) => total + t.amount, 0);
 
-    //category wise expenses
-
-    // Change this:
     const categorywise = [
       { name: "food", amount: 0 },
       { name: "travelling", amount: 0 },
       { name: "others", amount: 0 },
     ];
 
-    //check category is matched or not
-
-    transactions.forEach((transaction) => {
+    todayTransactions.forEach((transaction) => {
       const category = categorywise.find(
         (c) => c.name === transaction.category.toLowerCase(),
       );
@@ -232,19 +223,30 @@ export const dashbaord = async (req, res) => {
 
     const user = await User.findById(userId);
 
-   const remainingbudget = {
-      food: (user.dailybudget.food || 0) - (categorywise.find(c => c.name === "food")?.amount || 0),
-      travelling: (user.dailybudget.travelling || 0) - (categorywise.find(c => c.name === "travelling")?.amount || 0),
-      others: (user.dailybudget.others || 0) - (categorywise.find(c => c.name === "others")?.amount || 0),
+    // --- SIRF YE SAFETY CHECK LAGAYA HAI TAAKI 500 ERROR NA AAYE ---
+    const budget = user.dailybudget || { food: 0, travelling: 0, others: 0 };
+
+    const remainingbudget = {
+      food: (budget.food || 0) - (categorywise.find(c => c.name === "food")?.amount || 0),
+      travelling: (budget.travelling || 0) - (categorywise.find(c => c.name === "travelling")?.amount || 0),
+      others: (budget.others || 0) - (categorywise.find(c => c.name === "others")?.amount || 0),
     };
+
+    const dailyLimitTotal = (budget.food || 0) + (budget.travelling || 0) + (budget.others || 0);
+    const savingsToday = dailyLimitTotal - todayexpenses;
 
     res.json({
       totalexpenses,
       todayexpenses,
       categorywise,
       remainingbudget,
+      wallet: user.wallet || 0,
+      monthlyincome: user.monthlyincome || 0, // Frontend ke liye zaroori hai
+      savingsToday: savingsToday > 0 ? savingsToday : 0,
+      lastAnimTime: user.lastAnimTime || "" // Animation trigger logic ke liye
     });
   } catch (err) {
+    console.error(err); // Server terminal pe error dikhega
     res.status(500).json({
       message: err.message,
     });
@@ -278,5 +280,40 @@ export const checkgraph = async (req, res) => {
     res.status(500).json({
       message: err.message,
     });
+  }
+};
+
+//update monthly income
+
+export const updatemonthlyincome=async(req,res)=>{
+  try{
+    const monthlyincome=req.body.monthlyincome;
+    const userid=req.user.id;
+
+    const income=Number(monthlyincome);
+    const dailybudget=income/30;
+
+    const Updateuser=await User.findByIdAndUpdate(
+      userid,
+      {
+        monthlyincome:income,
+        dailybudget:{
+          food:dailybudget*0.4,
+          travelling:dailybudget*0.4,
+          others:dailybudget*0.2
+        }
+      }
+    )
+    res.json({
+      message:"Monthly income updated successfully",
+      Updateuser
+    })
+
+
+  }
+  catch(err){
+    res.status(500).json({
+      message:err.message
+    })
   }
 };

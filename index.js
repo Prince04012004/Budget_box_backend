@@ -3,6 +3,7 @@ import connectDB from "./config/db.js";
 import authroutes from "./routes/authroutes.js";
 import addexpenseRouter from "./routes/expenseroutes.js";
 import cors from "cors";
+import { budgetreset } from "./Cron/budgetreset.js"; // Path check kar lena bhai
 
 const port = process.env.PORT || 3000; 
 
@@ -12,6 +13,8 @@ app.use(cors());
 app.use(express.json()); 
 
 connectDB();
+
+budgetreset();
 
 app.use('/api', authroutes);
 app.use('/api', addexpenseRouter);

@@ -1,5 +1,5 @@
 import express from "express"
-import { addexpense, dashbaord, deleteexpense, getexpensses, updateexpense,checkgraph,getSingleExpense, getusercount } from "../controllers/expensecontroller.js"
+import { addexpense, dashbaord, deleteexpense, getexpensses, updateexpense,checkgraph,getSingleExpense, getusercount ,updatemonthlyincome} from "../controllers/expensecontroller.js"
 import authmiddlewares from "../middlewares/authmiddleware.js";
 import { get } from "mongoose";
 
@@ -12,6 +12,7 @@ expenseRoutes.delete("/deleteexpense/:id",authmiddlewares,deleteexpense)
 expenseRoutes.put("/updateexpense/:id",authmiddlewares,updateexpense)
 expenseRoutes.get("/dashboard",authmiddlewares,dashbaord);
 expenseRoutes.get("/checkgraph",authmiddlewares,checkgraph);
-expenseRoutes.get("/getusercount",getusercount);
+expenseRoutes.get("/getusercount",authmiddlewares,getusercount);
+expenseRoutes.put("/updatemonthlyincome",authmiddlewares,updatemonthlyincome);
 
 export default expenseRoutes;
