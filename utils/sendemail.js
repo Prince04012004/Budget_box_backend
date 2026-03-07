@@ -5,21 +5,13 @@ dotenv.config();
 export const sendmail = async (email, otp) => {
   try {
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
+      service: 'gmail', // 🔥 Ye Render ke liye sabse best hai
       auth: {
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS,
       },
-      // 🔥 Ye settings connection timeout ko rokengi
-      connectionTimeout: 30000, 
-      greetingTimeout: 30000,
-      socketTimeout: 30000,
-      family: 4, 
-      tls: {
-        rejectUnauthorized: false
-      }
+      // IPv4 force karne ki ab bhi zaroorat pad sakti hai
+      family: 4 
     });
 
     const mailoptions = {
@@ -30,16 +22,14 @@ export const sendmail = async (email, otp) => {
         <div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd;">
           <h2>BudgetBox Verification</h2>
           <p>Your OTP code is: <b style="font-size: 24px; color: #4A90E2;">${otp}</b></p>
-          <p>This code will expire in 5 minutes.</p>
         </div>
       `
     };
 
-    const result = await transporter.sendMail(mailoptions); 
-    return result;
+    return await transporter.sendMail(mailoptions); 
 
   } catch (err) {
-    console.error("Connection Error Detail:", err); 
+    console.error("Final Debug Error:", err.message); 
     throw new Error("Failed to send email");
   }
 };
