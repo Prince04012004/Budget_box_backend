@@ -1,29 +1,22 @@
-import { CourierClient } from "@trycourier/courier";
+// Purana import hatao aur ye likho:
+import { Courier } from "@trycourier/courier";
 
-const courier = CourierClient({ 
-  authorizationToken: process.env.COURIER_AUTH_TOKEN // token_T5A1G...
+const courier = new Courier({ 
+  authorizationToken: process.env.COURIER_AUTH_TOKEN 
 });
 
 export const sendmail = async (email, otp) => {
   try {
     const { requestId } = await courier.send({
       message: {
-        to: { 
-          email: email 
-        },
-        template: "Gmail_otp", //
+        to: { email: email },
+        template: "Gmail_otp", 
         data: {
-          otp_code: otp, // Ye tumhare {{otp_code}} se match karega
-        },
-        // Routing add karne se mail jaldi deliver hota hai
-        routing: {
-          method: "single",
-          channels: ["email"],
+          otp_code: otp, 
         },
       },
     });
-    console.log("OTP Sent! Request ID:", requestId);
-    return requestId;
+    console.log("OTP Sent via Courier! ID:", requestId);
   } catch (err) {
     console.error("Courier Error:", err.message);
     throw err;
