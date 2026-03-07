@@ -5,31 +5,40 @@ dotenv.config();
 export const sendmail = async (email, otp) => {
   try {
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
       auth: {
-        // Check karo ki .env mein variables ka naam exactly yahi hai
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS,
+      },
+      family: 4,
+      connectionTimeout: 10000,
+      tls: {
+        rejectUnauthorized: false
       }
     });
 
     const mailoptions = {
-      from: '"Budgetbox" <budgetbox2004@gmail.com>',
+      from: `"BudgetBox" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: "Your OTP Code",
-      text: `Your OTP code is ${otp}. It will expire in 5 minutes.`
+      subject: "Verification Code - BudgetBox",
+      html: `
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd;">
+          <h2>BudgetBox Verification</h2>
+          <p>Your OTP code is: <b style="font-size: 24px; color: #4A90E2;">${otp}</b></p>
+          <p>This code will expire in 5 minutes.</p>
+        </div>
+      `
     };
 
-    // 🔥 FIX: sendMail (M capital) hoga
     const result = await transporter.sendMail(mailoptions); 
     return result;
 
   } catch (err) {
-    // 🔥 Isse terminal mein asli wajah dikhegi
-    console.error("Nodemailer Error Details:", err.message); 
+    console.error("Nodemailer Error:", err.message); 
     throw new Error("Failed to send email");
   }
 };
 
 export default sendmail;
-
