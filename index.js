@@ -3,17 +3,20 @@ import connectDB from "./config/db.js";
 import authroutes from "./routes/authroutes.js";
 import addexpenseRouter from "./routes/expenseroutes.js";
 import cors from "cors";
-import { budgetreset } from "./Cron/budgetreset.js"; // Path check kar lena bhai
+import { budgetreset } from "./Cron/budgetreset.js";
 
-const port = process.env.PORT || 3000; 
+const port = process.env.PORT || 10000;
 
 const app = express();
 
-app.use(cors());
-app.use(express.json()); 
+app.use(cors({
+  origin: "*",
+  credentials: true
+}));
+
+app.use(express.json());
 
 connectDB();
-
 budgetreset();
 
 app.use('/api', authroutes);
@@ -23,6 +26,6 @@ app.get("/", (req, res) => {
   res.send("BudgetBox Backend is Running!");
 });
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`App is running on port ${port}`);
 });
