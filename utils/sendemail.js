@@ -12,10 +12,11 @@ export const sendmail = async (email, otp) => {
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS,
       },
-      family: 4,
-      connectionTimeout: 20000, 
-      greetingTimeout: 20000,
-      socketTimeout: 20000,
+      // 🔥 Ye settings connection timeout ko rokengi
+      connectionTimeout: 30000, 
+      greetingTimeout: 30000,
+      socketTimeout: 30000,
+      family: 4, 
       tls: {
         rejectUnauthorized: false
       }
@@ -38,7 +39,7 @@ export const sendmail = async (email, otp) => {
     return result;
 
   } catch (err) {
-    console.error("Nodemailer Error Details:", err); 
+    console.error("Connection Error Detail:", err); 
     throw new Error("Failed to send email");
   }
 };
