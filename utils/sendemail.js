@@ -7,15 +7,13 @@ export const sendmail = async (email, otp) => {
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
-      secure: false,
+      secure: false, // 587 ke liye false hi rahega
       auth: {
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS,
       },
-      family: 4,
-      connectionTimeout: 30000,
-      greetingTimeout: 30000,
-      socketTimeout: 30000,
+      family: 4, // 🔥 Ye line IPv6 ko block karke IPv4 force karegi
+      connectionTimeout: 20000, 
       tls: {
         rejectUnauthorized: false
       }
@@ -29,13 +27,11 @@ export const sendmail = async (email, otp) => {
         <div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd;">
           <h2>BudgetBox Verification</h2>
           <p>Your OTP code is: <b style="font-size: 24px; color: #4A90E2;">${otp}</b></p>
-          <p>This code will expire in 5 minutes.</p>
         </div>
       `
     };
 
-    const result = await transporter.sendMail(mailoptions); 
-    return result;
+    return await transporter.sendMail(mailoptions); 
 
   } catch (err) {
     console.error("Nodemailer Error:", err.message); 
