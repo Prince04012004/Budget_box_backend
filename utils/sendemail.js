@@ -5,31 +5,29 @@ dotenv.config();
 export const sendmail = async (email, otp) => {
   try {
     const transporter = nodemailer.createTransport({
-      // Hum direct Gmail ke server IP ko hit karenge
-      host: "74.125.200.108", 
-      port: 465,
-      secure: true,
+      service: 'gmail', // Standard service use karo, IP ki zaroorat nahi
       auth: {
         user: process.env.EMAIL_USER, 
-        pass: process.env.EMAIL_PASS,
+        pass: process.env.EMAIL_PASS, // Bina space wala password
       },
-      family: 4,
-      connectionTimeout: 40000,
-      tls: {
-        // Ye line zaroori hai jab IP use kar rahe ho
-        servername: "smtp.gmail.com",
-        rejectUnauthorized: false
-      }
     });
 
     const mailoptions = {
       from: `"BudgetBox" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Verification Code - BudgetBox",
-      html: `<p>Your OTP code is: <b>${otp}</b></p>`
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee;">
+          <h2 style="color: #4CAF50;">BudgetBox Verification</h2>
+          <p>Your OTP code is: <b style="font-size: 24px;">${otp}</b></p>
+          <p>This code is valid for 10 minutes.</p>
+        </div>
+      `
     };
 
-    return await transporter.sendMail(mailoptions); 
+    const info = await transporter.sendMail(mailoptions);
+    console.log("Email sent successfully:", info.messageId);
+    return info;
 
   } catch (err) {
     console.error("DEBUG ERROR:", err.message); 
