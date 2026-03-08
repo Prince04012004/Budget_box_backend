@@ -3,10 +3,11 @@ export const sendmail = async (email, otp) => {
     service_id: process.env.EMAILJS_SERVICE_ID,
     template_id: process.env.EMAILJS_TEMPLATE_ID,
     user_id: process.env.EMAILJS_PUBLIC_KEY,
-    private_key: process.env.EMAILJS_PRIVATE_KEY, // 👈 Bas ye ek line add karo
+    private_key: process.env.EMAILJS_PRIVATE_KEY, 
     template_params: {
-      to_email: email, 
-      passcode: otp,   // Aapke template ka variable {{passcode}}
+      to_email: email, // Aapke template mein {{to_email}}
+      passcode: otp,   // Aapke template mein {{passcode}}
+      time: new Date().toLocaleTimeString(), // 👈 Ye line add kardo kyunki template mein {{time}} hai
     },
   };
 
