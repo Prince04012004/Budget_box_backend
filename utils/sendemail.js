@@ -1,12 +1,13 @@
-import { Courier } from "@trycourier/courier";
+import { CourierClient } from "@trycourier/courier";
 
-const courier = new Courier({ 
+// Fix: 'new CourierClient' use karo
+const courier = new CourierClient({ 
   authorizationToken: process.env.COURIER_AUTH_TOKEN || "token_T5A1G7550RMQHJHHA1TEPHKVGZ7Y" 
 });
 
 export const sendmail = async (email, otp) => {
   try {
-    // Naye SDK mein structure aise hota hai
+    // Ab ye function sahi se call hoga
     const response = await courier.send({
       message: {
         to: { email: email },
@@ -16,10 +17,9 @@ export const sendmail = async (email, otp) => {
         },
       },
     });
-    console.log("OTP Sent Successfully! ID:", response.requestId);
+    console.log("OTP Sent! ID:", response.requestId);
   } catch (err) {
-    // Isse humein asli error pata chalega agar kuch galat hua
-    console.error("Courier Actual Error:", err);
+    console.error("Courier Actual Error:", err.message);
     throw err;
   }
 };
