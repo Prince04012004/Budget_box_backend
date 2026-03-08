@@ -1,13 +1,13 @@
 import { Courier } from "@trycourier/courier";
 
-// Is tarah likhne se Courier ko error dene ka mauka nahi milega
 const courier = new Courier({ 
-  apiKey: process.env.COURIER_AUTH_TOKEN || process.env.COURIER_API_KEY 
+  authorizationToken: process.env.COURIER_AUTH_TOKEN || "token_T5A1G7550RMQHJHHA1TEPHKVGZ7Y" 
 });
 
 export const sendmail = async (email, otp) => {
   try {
-    const { requestId } = await courier.send({
+    // Naye SDK mein structure aise hota hai
+    const response = await courier.send({
       message: {
         to: { email: email },
         template: "Gmail_otp", 
@@ -16,9 +16,10 @@ export const sendmail = async (email, otp) => {
         },
       },
     });
-    console.log("OTP Sent! ID:", requestId);
+    console.log("OTP Sent Successfully! ID:", response.requestId);
   } catch (err) {
-    console.error("Courier Error:", err.message);
+    // Isse humein asli error pata chalega agar kuch galat hua
+    console.error("Courier Actual Error:", err);
     throw err;
   }
 };
