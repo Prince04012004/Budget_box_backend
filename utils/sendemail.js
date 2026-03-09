@@ -2,12 +2,11 @@ export const sendmail = async (email, otp) => {
   const data = {
     service_id: process.env.EMAILJS_SERVICE_ID,
     template_id: process.env.EMAILJS_TEMPLATE_ID,
-    user_id: process.env.EMAILJS_PUBLIC_KEY, 
-    private_key: process.env.EMAILJS_PRIVATE_KEY, // 👈 ab tumhari private key use ho rahi hai
+    user_id: process.env.EMAILJS_PUBLIC_KEY, // 👈 ab sirf public key
     template_params: {
-      to_email: email,        // Template me {{to_email}}
-      passcode: otp,          // Template me {{passcode}}
-      time: new Date().toLocaleTimeString(), // Agar template me {{time}} hai
+      to_email: email,        // matches {{to_email}}
+      passcode: otp,          // matches {{passcode}}
+      time: new Date().toLocaleTimeString(), // matches {{time}}
     },
   };
 
