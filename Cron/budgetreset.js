@@ -3,33 +3,52 @@ import User from "../model/User.js";
 import transaction from "../model/transaction.js";
 
 export const budgetreset = () => {
-    cron.schedule("0 0 * * *", async () => {
+    // Testing: Runs every 1 minute
+    cron.schedule("* * * * *", async () => {
         try {
             const users = await User.find({});
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
 
             for (const user of users) {
-                const todaytransactions = await transaction.find({
+                // 1. Get transactions for the current period
+                const todayTransactions = await transaction.find({
                     userId: user._id,
-                    date: { $gte: today }
+                    date: { $gte: todayStart }
                 });
 
-                const totalspenttoday = todaytransactions.reduce((acc, t) => acc + t.amount, 0);
-                const dailylimit = (user.dailybudget.food || 0) + (user.dailybudget.travelling || 0) + (user.dailybudget.others || 0);
-                const savings = dailylimit - totalspenttoday;
+                const totalSpent = todayTransactions.reduce((acc, t) => acc + t.amount, 0);
+                
+                // 2. Calculate daily limit and savings
+                const dailyLimit = (user.monthlyincome || 0) / 30;
+                const savings = dailyLimit - totalSpent;
 
+                // 3. Update savings and animation flag if user saved money
                 if (savings > 0) {
-                    user.wallet = (user.wallet || 0) + savings;
-                    user.savingsToday = savings;
-                    user.lastAnimTime = new Date().getTime().toString();
+                    user.savingsToday = Math.round(savings);
+                    user.lastAnimTime = new Date().getTime().toString(); 
+                    // Note: We don't add to wallet here because frontend handleCollect does it
+                } else {
+                    user.savingsToday = 0;
                 }
 
+                // 4. RESET for the next "cycle" (Refilling the budget)
+                user.todayexpenses = 0; // Reset progress bar
+                
+                const limitPerCategory = dailyLimit / 3; 
+                user.remainingbudget = {
+                    food: limitPerCategory,
+                    travelling: limitPerCategory,
+                    others: limitPerCategory
+                };
+
                 user.budgetOver = { food: 0, travelling: 0, others: 0 };
+
                 await user.save();
+                console.log(`User ${user.email} budget refilled!`);
             }
         } catch (err) {
-            console.error(err.message);
+            console.error("Test Cron Error:", err.message);
         }
     });
 };
